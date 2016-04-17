@@ -151,18 +151,18 @@ public class MainActivity extends AppCompatActivity
     private void startListening() {
         Log.d(TAG, "startListening");
 
-        //audioRecord.startRecording();
-        //audioTrack.play();
+        audioRecord.startRecording();
+        audioTrack.play();
 
-        //playbackThread.play();
+        playbackThread.play();
     }
 
     private void stopListening() {
         Log.d(TAG, "stopListening");
 
-        //playbackThread.pause();
+        playbackThread.pause();
 
-        //audioRecord.stop();
-        //audioTrack.pause();
+        audioRecord.stop();
+        audioTrack.pause();
     }
 }
