@@ -1,12 +1,10 @@
 package kurufasulye.synthesizer;
 
-import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,7 +20,6 @@ public class MainActivity extends AppCompatActivity
     private boolean initialized = false;
     private ToggleButton listenToggleButton;
 
-    private AudioManager audioManager;
     private AudioRecord audioRecord;
     private AudioTrack audioTrack;
 
@@ -44,24 +41,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        initialized = initializePlaybackResources();
-
-        if (!initialized) {
-            Toast.makeText(this, "Init Error", Toast.LENGTH_SHORT).show();
-            listenToggleButton.setEnabled(false);
-        }
-    }
-
-    @Override
     protected void onPause() {
+        super.onPause();
+
         if (initialized) {
             unInitializePlaybackResources();
+            listenToggleButton.setChecked(false);
             initialized = false;
         }
-        super.onPause();
     }
 
     @Override
@@ -78,11 +65,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private boolean initializePlaybackResources() {
-        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        //audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-        // TODO : For demo purposes
-        //audioManager.setSpeakerphoneOn(true);
-
         int minRecordBufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_IN_CONFIG, ENCODING);
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 SAMPLE_RATE,
@@ -117,14 +99,15 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (playbackThread == null) {
-            playbackThread = new PlaybackThread(audioRecord, audioTrack);
+            playbackThread = new PlaybackThread();
         }
 
         return true;
     }
 
     private void unInitializePlaybackResources() {
-        audioManager = null;
+        if (playbackThread != null)
+            playbackThread.pause();
 
         audioRecord.stop();
         audioRecord.release();
@@ -133,9 +116,6 @@ public class MainActivity extends AppCompatActivity
         audioTrack.stop();
         audioTrack.release();
         audioTrack = null;
-
-        if (playbackThread != null)
-            playbackThread.pause();
     }
 
     private void handleListenToggleButtonClick() {
@@ -151,18 +131,28 @@ public class MainActivity extends AppCompatActivity
     private void startListening() {
         Log.d(TAG, "startListening");
 
-        audioRecord.startRecording();
-        audioTrack.play();
+        initialized = initializePlaybackResources();
 
-        playbackThread.play();
+        if (!initialized) {
+            Toast.makeText(this, "Init Error", Toast.LENGTH_SHORT).show();
+            listenToggleButton.setEnabled(false);
+            return;
+        }
+
+        audioRecord.startRecording();
+        Log.d(TAG, "startRecording");
+        audioTrack.play();
+        Log.d(TAG, "play");
+
+        playbackThread.play(audioRecord, audioTrack);
     }
 
     private void stopListening() {
         Log.d(TAG, "stopListening");
 
-        playbackThread.pause();
-
-        audioRecord.stop();
-        audioTrack.pause();
+        if (initialized) {
+            unInitializePlaybackResources();
+            initialized = false;
+        }
     }
 }

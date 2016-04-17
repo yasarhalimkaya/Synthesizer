@@ -7,20 +7,18 @@ import android.util.Log;
 public class PlaybackThread implements Runnable {
 
     private final static String TAG = "PlaybackThread";
-    private AudioRecord audioRecord;
-    private AudioTrack audioTrack;
 
     // TODO : I don't know what to give, according to what?
     private final int bufferSize = 1024;
+    private AudioRecord audioRecord;
+    private AudioTrack audioTrack;
 
     private Thread thread;
 
-    public PlaybackThread(AudioRecord audioRecord, AudioTrack audioTrack) {
+    public void play(AudioRecord audioRecord, AudioTrack audioTrack) {
         this.audioRecord = audioRecord;
         this.audioTrack = audioTrack;
-    }
 
-    public void play() {
         if (thread == null)
             thread = new Thread(this);
 
@@ -46,6 +44,6 @@ public class PlaybackThread implements Runnable {
 
         Log.d(TAG, "Thread stopped running");
 
-        //thread = null;
+        thread = null;
     }
 }
