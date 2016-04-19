@@ -25,7 +25,7 @@ public class PlaybackThread implements Runnable {
         thread.start();
     }
 
-    public void pause() {
+    public void stop() {
         if (thread != null)
             thread.interrupt();
     }
