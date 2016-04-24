@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity
         listenToggleButton.setOnClickListener(this);
 
         // Use AndroidPlayer
-        player = new AndroidPlayer();
+        player = new OpenSLPlayer();
     }
 
     @Override

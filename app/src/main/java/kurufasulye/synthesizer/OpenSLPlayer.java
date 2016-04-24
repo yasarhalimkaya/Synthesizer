@@ -5,9 +5,14 @@ package kurufasulye.synthesizer;
  * native OpenSL apis
  */
 public class OpenSLPlayer implements Player {
+
+    static {
+        System.loadLibrary("openslplayerjni");
+    }
+
     @Override
     public boolean start() {
-        return false;
+        return init();
     }
 
     @Override
@@ -19,4 +24,10 @@ public class OpenSLPlayer implements Player {
     public void mute(boolean isMute) {
 
     }
+
+    /**
+     * @return <code>true</code> on success
+     *         <code>false</code> otherwise
+     */
+    private native boolean init();
 }
