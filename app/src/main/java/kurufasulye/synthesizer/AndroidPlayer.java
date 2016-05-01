@@ -1,5 +1,6 @@
 package kurufasulye.synthesizer;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -14,18 +15,24 @@ import android.util.Log;
 public class AndroidPlayer implements Player {
     private static final String TAG = "AndroidPlayer";
 
+    private Context context;
+
     private boolean mIsPlaying = false;
 
     private AudioRecord mAudioRecord;
     private AudioTrack mAudioTrack;
 
-    private int SAMPLE_RATE = 44100; // Hz
+    private int SAMPLE_RATE; // Hz
     private int CHANNEL_IN_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private int CHANNEL_OUT_CONFIG = AudioFormat.CHANNEL_OUT_MONO;
     private int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
     // Only responsible for starting/pausing the thread
     private PlaybackThread mPlaybackThread;
+
+    public AndroidPlayer(Context context) {
+        this.context = context;
+    }
 
     @Override
     public boolean start() {
@@ -41,6 +48,9 @@ public class AndroidPlayer implements Player {
     }
 
     private boolean initResources() {
+        AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        SAMPLE_RATE = Integer.parseInt(audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE));
+
         int minRecordBufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_IN_CONFIG, ENCODING);
         mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 SAMPLE_RATE,

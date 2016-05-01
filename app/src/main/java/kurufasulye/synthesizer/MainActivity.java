@@ -23,13 +23,14 @@ public class MainActivity extends AppCompatActivity
         listenToggleButton = (ToggleButton) findViewById(R.id.listenToggleButton);
         listenToggleButton.setOnClickListener(this);
 
-        // Use AndroidPlayer
-        player = new OpenSLPlayer();
+        // Instatiate a Player
+        player = new AndroidPlayer(this);
+        //player = new OpenSLPlayer(this);
     }
 
     @Override
     protected void onDestroy() {
-        player.stop();
+        stopListening();
         super.onDestroy();
     }
 
@@ -63,8 +64,6 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Play Error", Toast.LENGTH_SHORT).show();
             listenToggleButton.setChecked(false);
         }
-
-        player.start();
     }
 
     private void stopListening() {
