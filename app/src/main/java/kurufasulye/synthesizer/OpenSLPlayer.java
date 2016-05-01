@@ -10,7 +10,7 @@ import android.util.Log;
  * A <code>Player</code> object implemented using
  * native OpenSL apis
  */
-public class OpenSLPlayer implements Player {
+public class OpenSLPlayer extends Player {
     private static final String TAG = "OpenSLPlayer";
 
     private Context context;

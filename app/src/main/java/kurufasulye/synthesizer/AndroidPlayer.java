@@ -12,7 +12,7 @@ import android.util.Log;
  * A <code>Player</code> implementation
  * using Android's <code>AudioRecord</code> and <code>AudioTrack</code> apis
  */
-public class AndroidPlayer implements Player {
+public class AndroidPlayer extends Player {
     private static final String TAG = "AndroidPlayer";
 
     private Context context;

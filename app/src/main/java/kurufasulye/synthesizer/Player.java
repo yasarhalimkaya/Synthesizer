@@ -1,9 +1,9 @@
 package kurufasulye.synthesizer;
 
 /**
- * Player interface
+ * Player abstract class
  */
-public interface Player {
+public abstract class Player {
     /**
      * Player should allocate its resources, if any,
      * and start listening and playing
@@ -12,7 +12,7 @@ public interface Player {
      *          and Player starts to listen and play without error
      *          <code>false</code> otherwise
      */
-    public boolean start();
+    public abstract boolean start();
 
     /**
      * Player should stop listening and playing
@@ -21,7 +21,7 @@ public interface Player {
      * it is destroyed or any other Player tries to
      * acquire these resources
      */
-    public void stop();
+    public abstract void stop();
 
     /**
      * Player should start/stop playback without destroying itself
@@ -29,5 +29,5 @@ public interface Player {
      * @param isMute <code>true</code> for starting playback
      *               <code>false</code> for stopping
      */
-    public void mute(boolean isMute);
+    public abstract void mute(boolean isMute);
 }
