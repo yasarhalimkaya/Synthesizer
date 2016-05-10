@@ -14,10 +14,20 @@
     <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New ToggleButton"
         android:id="@+id/listenToggleButton"
         android:textOff="Listen"
         android:textOn="Listening"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New ToggleButton"
+        android:id="@+id/muteToggleButton"
+        android:layout_below="@+id/listenToggleButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="34dp"
+        android:textOn="Unmute"
+        android:textOff="Mute" />
 </RelativeLayout>

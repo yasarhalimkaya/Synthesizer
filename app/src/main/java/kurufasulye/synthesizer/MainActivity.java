@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity
 {
     private final static String TAG = "MainActivity";
     private ToggleButton listenToggleButton;
+    private ToggleButton muteToggleButton;
     private Player player;
 
     @Override
@@ -22,6 +23,9 @@ public class MainActivity extends AppCompatActivity
 
         listenToggleButton = (ToggleButton) findViewById(R.id.listenToggleButton);
         listenToggleButton.setOnClickListener(this);
+
+        muteToggleButton = (ToggleButton) findViewById(R.id.muteToggleButton);
+        muteToggleButton.setOnClickListener(this);
 
         // Instatiate a Player
         player = new AndroidPlayer(this);
@@ -40,6 +44,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.listenToggleButton:
                 handleListenToggleButtonClick();
                 break;
+            case R.id.muteToggleButton:
+                handleMuteToggleButtonClick();
+                break;
             default:
                 if (BuildConfig.DEBUG)
                     Log.w(TAG, "Unhandled onClick event with View : " + v);
@@ -48,18 +55,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void handleListenToggleButtonClick() {
-        Log.d(TAG, "onClick called");
-
         if (listenToggleButton.isChecked()) {
             startListening();
+            muteToggleButton.setEnabled(true);
         } else {
             stopListening();
+            muteToggleButton.setChecked(false);
+            muteToggleButton.setEnabled(false);
+        }
+    }
+
+    private void handleMuteToggleButtonClick() {
+        if (muteToggleButton.isChecked()) {
+            player.mute(true);
+        } else {
+            player.mute(false);
         }
     }
 
     private void startListening() {
-        Log.d(TAG, "startListening");
-
         if (!player.start()) {
             Toast.makeText(this, "Play Error", Toast.LENGTH_SHORT).show();
             listenToggleButton.setChecked(false);
@@ -67,8 +81,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void stopListening() {
-        Log.d(TAG, "stopListening");
-
         player.stop();
     }
 }

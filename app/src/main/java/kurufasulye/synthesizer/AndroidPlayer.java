@@ -110,7 +110,16 @@ public class AndroidPlayer extends Player {
 
     @Override
     public void mute(boolean isMute) {
-        Log.w(TAG, "Not implemented Player::mute()");
-        return;
+        Log.w(TAG, "mute called");
+
+        if (!mIsPlaying) {
+            return;
+        }
+
+        if (isMute) {
+            mAudioTrack.pause();
+        } else {
+            mAudioTrack.play();
+        }
     }
 }
