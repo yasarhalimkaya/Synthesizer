@@ -67,8 +67,7 @@ public class OpenSLPlayer extends Player {
     }
 
     /**
-     * @return <code>true</code> on success
-     *         <code>false</code> otherwise
+     * Native function declarations
      */
     private native boolean init();
 }
