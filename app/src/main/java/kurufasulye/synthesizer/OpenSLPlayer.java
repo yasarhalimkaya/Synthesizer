@@ -14,8 +14,6 @@ public class OpenSLPlayer extends Player {
     private static final String TAG = "OpenSLPlayer";
 
     private Context context;
-    private String nativeSampleRate;
-    private String nativeSampleBufferSize;
 
     public OpenSLPlayer(Context context) {
         this.context = context;
@@ -23,12 +21,15 @@ public class OpenSLPlayer extends Player {
 
     @Override
     public boolean start() {
-        if (!isSystemSupportRecording()) {
-            Log.e(TAG, "System does not support recording");
-            return false;
-        }
+        AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
 
-        return init();
+        int nativeSampleRate = Integer.parseInt(audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE));
+        int nativeSampleBufferSize = Integer.parseInt(audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER));
+
+        if (!init(nativeSampleRate, nativeSampleBufferSize))
+            return false;
+
+        return true;
     }
 
     @Override
@@ -41,24 +42,6 @@ public class OpenSLPlayer extends Player {
 
     }
 
-    private boolean isSystemSupportRecording() {
-        AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-
-        nativeSampleRate = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
-        nativeSampleBufferSize = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
-
-        int recordBufferSize = AudioRecord.getMinBufferSize(
-                Integer.parseInt(nativeSampleRate),
-                AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT);
-
-        if (recordBufferSize == AudioRecord.ERROR || recordBufferSize == AudioRecord.ERROR_BAD_VALUE) {
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * Load native library
      */
@@ -69,5 +52,5 @@ public class OpenSLPlayer extends Player {
     /**
      * Native function declarations
      */
-    private native boolean init();
+    private native boolean init(int sampleRate, int bufferSize);
 }

@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity
         muteToggleButton = (ToggleButton) findViewById(R.id.muteToggleButton);
         muteToggleButton.setOnClickListener(this);
 
-        // Instatiate a Player
+        // Instantiate a Player
         player = new AndroidPlayer(this);
         //player = new OpenSLPlayer(this);
     }

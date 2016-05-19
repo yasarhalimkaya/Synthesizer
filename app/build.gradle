@@ -20,7 +20,9 @@ model {
         }
     }
     android.ndk {
+        platformVersion = 23
         moduleName = "openslplayerjni"
+        ldLibs.addAll(['android','OpenSLES', 'log'])
     }
 }
 

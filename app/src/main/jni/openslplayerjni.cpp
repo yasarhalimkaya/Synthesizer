@@ -11,11 +11,11 @@ extern "C" {
 #endif
 
 JNIEXPORT jboolean JNICALL
-Java_kurufasulye_synthesizer_OpenSLPlayer_init(JNIEnv *env, jobject instance) {
+Java_kurufasulye_synthesizer_OpenSLPlayer_init(JNIEnv *env, jobject instance, jint sampleRate, jint bufferSize) {
     jboolean retVal;
 
     OpenSLPlayerNative *openSLPlayerNative = OpenSLPlayerNative::getInstance();
-    retVal = openSLPlayerNative->init() ? 1 : 0;
+    retVal = (jboolean)openSLPlayerNative->init(sampleRate, bufferSize);
 
     return retVal;
 }
