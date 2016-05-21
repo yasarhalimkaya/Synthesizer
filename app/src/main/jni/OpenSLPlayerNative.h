@@ -11,11 +11,18 @@ class OpenSLPlayerNative {
 private:
     OpenSLPlayerNative();
 
-    const char* TAG;
     static OpenSLPlayerNative* _instance;
+    bool initialized;
     SLObjectItf engineObject;
     SLEngineItf engineEngine;
     SLObjectItf outputMixObject;
+    SLObjectItf playerObject;
+    SLPlayItf playerPlay;
+    SLAndroidSimpleBufferQueueItf playerBufferQueue;
+    SLVolumeItf playerVolume;
+    SLObjectItf recorderObject;
+    SLRecordItf recorderRecord;
+    SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
 public:
     static OpenSLPlayerNative* getInstance();
