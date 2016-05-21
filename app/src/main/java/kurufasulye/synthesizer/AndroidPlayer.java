@@ -12,23 +12,24 @@ import android.util.Log;
  * A <code>Player</code> implementation
  * using Android's <code>AudioRecord</code> and <code>AudioTrack</code> apis
  */
-public class AndroidPlayer extends Player {
+public class AndroidPlayer extends Player implements Runnable {
     private static final String TAG = "AndroidPlayer";
 
     private Context context;
 
-    private boolean mIsPlaying = false;
+    private boolean playing = false;
 
-    private AudioRecord mAudioRecord;
-    private AudioTrack mAudioTrack;
+    private AudioRecord audioRecord;
+    private AudioTrack audioTrack;
 
     private int SAMPLE_RATE; // Hz
     private int CHANNEL_IN_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private int CHANNEL_OUT_CONFIG = AudioFormat.CHANNEL_OUT_MONO;
     private int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+    private int BUFFER_SIZE;
+    private short[] audioBuffer;
 
-    // Only responsible for starting/pausing the thread
-    private PlaybackThread mPlaybackThread;
+    private Thread thread;
 
     public AndroidPlayer(Context context) {
         this.context = context;
@@ -36,90 +37,105 @@ public class AndroidPlayer extends Player {
 
     @Override
     public boolean start() {
-        if (!mIsPlaying && initResources()) {
-            mAudioRecord.startRecording();
-            mAudioTrack.play();
-            mPlaybackThread.play(mAudioRecord, mAudioTrack);
+        if (!playing && init()) {
+            audioRecord.startRecording();
+            audioTrack.play();
 
-            mIsPlaying = true;
+            audioBuffer = new short[BUFFER_SIZE];
+
+            if (thread == null)
+                thread = new Thread(this);
+
+            thread.setPriority(Thread.MAX_PRIORITY);
+            thread.start();
+
+            playing = true;
         }
 
-        return mIsPlaying;
+        return playing;
     }
 
-    private boolean initResources() {
+    @Override
+    public void run() {
+        // TODO : Should try/catch exceptions?
+        while (!thread.isInterrupted()) {
+            int readDataSize = audioRecord.read(audioBuffer, 0, BUFFER_SIZE);
+            audioTrack.write(audioBuffer, 0, readDataSize);
+        }
+
+        thread = null;
+    }
+
+    private boolean init() {
         AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         SAMPLE_RATE = Integer.parseInt(audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE));
 
         int minRecordBufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_IN_CONFIG, ENCODING);
-        mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+        audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 SAMPLE_RATE,
                 CHANNEL_IN_CONFIG,
                 ENCODING,
                 minRecordBufferSize);
 
-        if (mAudioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
+        if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
             Log.e(TAG, "AudioRecord is not initialized, returning");
-            if (mAudioRecord != null) {
-                mAudioRecord.release();
-                mAudioRecord = null;
+            if (audioRecord != null) {
+                audioRecord.release();
+                audioRecord = null;
             }
             return false;
         }
 
         int minTrackBufferSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, CHANNEL_OUT_CONFIG, ENCODING);
-        mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                 SAMPLE_RATE,
                 CHANNEL_OUT_CONFIG,
                 ENCODING,
                 minTrackBufferSize,
                 AudioTrack.MODE_STREAM);
 
-        if (mAudioTrack.getState() != AudioTrack.STATE_INITIALIZED) {
+        if (audioTrack.getState() != AudioTrack.STATE_INITIALIZED) {
             Log.e(TAG, "AudioTrack is not initialized, returning");
-            if (mAudioTrack != null) {
-                mAudioTrack.release();
-                mAudioTrack = null;
+            if (audioTrack != null) {
+                audioTrack.release();
+                audioTrack = null;
             }
             return false;
         }
 
-        if (mPlaybackThread == null) {
-            mPlaybackThread = new PlaybackThread();
-        }
+        BUFFER_SIZE = minRecordBufferSize > minTrackBufferSize ? minRecordBufferSize : minTrackBufferSize;
 
         return true;
     }
 
     @Override
     public void stop() {
-        if (mIsPlaying) {
-            mPlaybackThread.stop();
+        if (playing) {
+            if (thread != null)
+                thread.interrupt();
 
-            mAudioRecord.stop();
-            mAudioRecord.release();
-            mAudioRecord = null;
+            audioRecord.stop();
+            audioRecord.release();
+            audioRecord = null;
 
-            mAudioTrack.stop();
-            mAudioTrack.release();
-            mAudioTrack = null;
+            audioTrack.stop();
+            audioTrack.release();
+            audioTrack = null;
 
-            mIsPlaying = false;
+            playing = false;
         }
     }
 
     @Override
     public void mute(boolean isMute) {
-        Log.w(TAG, "mute called");
-
-        if (!mIsPlaying) {
+        if (!playing) {
             return;
         }
 
         if (isMute) {
-            mAudioTrack.pause();
+            audioTrack.pause();
         } else {
-            mAudioTrack.play();
+            audioTrack.play();
         }
     }
 }
