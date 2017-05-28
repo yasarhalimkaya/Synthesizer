@@ -71,6 +71,7 @@ public class AndroidPlayer extends Player implements Runnable {
         SAMPLE_RATE = Integer.parseInt(audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE));
 
         int minRecordBufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_IN_CONFIG, ENCODING);
+
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 SAMPLE_RATE,
                 CHANNEL_IN_CONFIG,
