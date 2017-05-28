@@ -1,10 +1,7 @@
 package kurufasulye.synthesizer;
 
 import android.content.Context;
-import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.AudioRecord;
-import android.util.Log;
 
 /**
  * A <code>Player</code> object implemented using

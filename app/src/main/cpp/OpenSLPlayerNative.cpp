@@ -1,9 +1,8 @@
 #include "OpenSLPlayerNative.h"
 
-#include <stdlib.h>
 #include <android/log.h>
 const char* TAG = "OpenSLPlayerNative";
-#define LOG(assertion, message) if(!assertion) __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s : %d -> %s", __FUNCTION__, __LINE__, message);
+#define LOG(assertion, message) if(!(assertion)) __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s : %d -> %s", __FUNCTION__, __LINE__, message);
 
 OpenSLPlayerNative* OpenSLPlayerNative::_instance = NULL;
 
@@ -29,13 +28,13 @@ OpenSLPlayerNative *OpenSLPlayerNative::getInstance() {
     return _instance;
 }
 
-// this callback handler is called every time a buffer finishes playing
+// Called every time a buffer finishes playing
 void playerBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
     LOG(false, "Not implemented");
 }
 
-// this callback handler is called every time a buffer finishes recording
+// Called every time a buffer finishes recording
 void recorderBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
     LOG(false, "Not implemented");
@@ -59,8 +58,8 @@ bool OpenSLPlayerNative::init(int sampleRate, int bufferSize) {
         LOG(result == SL_RESULT_SUCCESS, "Failed get engine interface");
 
         // Create output mix
-        const SLInterfaceID ids[] = {SL_IID_VOLUME};
-        const SLboolean reqs[] = {SL_BOOLEAN_FALSE};
+        const SLInterfaceID ids[1] = {SL_IID_VOLUME};
+        const SLboolean reqs[1] = {SL_BOOLEAN_FALSE};
         result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1,
                                                   ids, reqs);
         LOG(result == SL_RESULT_SUCCESS, "Failed to create output mix");
@@ -82,7 +81,7 @@ bool OpenSLPlayerNative::init(int sampleRate, int bufferSize) {
         SLDataFormat_PCM formatPcm;
         formatPcm.formatType = SL_DATAFORMAT_PCM;
         formatPcm.numChannels = 1;
-        formatPcm.samplesPerSec = SL_SAMPLINGRATE_8;
+        formatPcm.samplesPerSec = SL_SAMPLINGRATE_48;
         formatPcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
         formatPcm.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
         formatPcm.channelMask = SL_SPEAKER_FRONT_CENTER;
@@ -151,7 +150,7 @@ bool OpenSLPlayerNative::init(int sampleRate, int bufferSize) {
         SLDataFormat_PCM formatPcm;
         formatPcm.formatType = SL_DATAFORMAT_PCM;
         formatPcm.numChannels = 1;
-        formatPcm.samplesPerSec = SL_SAMPLINGRATE_8;
+        formatPcm.samplesPerSec = SL_SAMPLINGRATE_48;
         formatPcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
         formatPcm.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
         formatPcm.channelMask = SL_SPEAKER_FRONT_CENTER;
@@ -172,17 +171,19 @@ bool OpenSLPlayerNative::init(int sampleRate, int bufferSize) {
         result = (*recorderObject)->GetInterface(recorderObject, SL_IID_RECORD, &recorderRecord);
         LOG(result == SL_RESULT_SUCCESS, "Failed to get audio recorder interface");
 
-        result = (*recorderObject)->GetInterface(recorderObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &recorderBufferQueue);
+        result = (*recorderObject)->GetInterface(recorderObject,
+                                                 SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+                                                 &recorderBufferQueue);
         LOG(result == SL_RESULT_SUCCESS, "Failed to get recorder buffer queue interface");
 
-        result = (*recorderBufferQueue)->RegisterCallback(recorderBufferQueue, recorderBufferQueueCallback, NULL);
+        result = (*recorderBufferQueue)->RegisterCallback(recorderBufferQueue,
+                                                          recorderBufferQueueCallback,
+                                                          NULL);
         LOG(result == SL_RESULT_SUCCESS, "Failed to register recorder buffer queue callback");
 
         result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_RECORDING);
         LOG(result == SL_RESULT_SUCCESS, "Failed to start recorder");
     }
-
-
 
     LOG(false, "Successfully initialized OpenSLPlayer");
 

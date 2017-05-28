@@ -1,6 +1,6 @@
 package kurufasulye.synthesizer;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends Activity
                           implements Button.OnClickListener
 {
     private final static String TAG = "MainActivity";
@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity
         muteToggleButton.setOnClickListener(this);
 
         // Instantiate a Player
-        player = new AndroidPlayer(this);
-        //player = new OpenSLPlayer(this);
+        //player = new AndroidPlayer(this);
+        player = new OpenSLPlayer(this);
     }
 
     @Override

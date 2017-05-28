@@ -6,6 +6,7 @@
 
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
+#include <pthread.h>
 
 class OpenSLPlayerNative {
 private:
